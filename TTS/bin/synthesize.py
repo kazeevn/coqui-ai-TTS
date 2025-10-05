@@ -162,6 +162,7 @@ def parse_args(arg_list: list[str] | None) -> argparse.Namespace:
     )
 
     parser.add_argument("--text", type=str, default=None, help="Text to generate speech.")
+    parser.add_argument("--text_file", type=str, default=None, help="Path to a text file to generate speech from.")
 
     # Args for running pre-trained TTS models.
     parser.add_argument(
@@ -301,6 +302,7 @@ def parse_args(arg_list: list[str] | None) -> argparse.Namespace:
     # print the description if either text or list_models is not set
     check_args = [
         args.text,
+        args.text_file,
         args.list_models,
         args.list_speaker_idxs,
         args.list_language_idxs,
@@ -403,12 +405,15 @@ def main(arg_list: list[str] | None = None) -> None:
             sys.exit(0)
 
         # RUN THE SYNTHESIS
-        if args.text:
-            logger.info("Text: %s", args.text)
+        text_to_synthesize = args.text
+        if text_to_synthesize is None and args.text_file:
+            with open(args.text_file, "r", encoding="utf-8") as f:
+                text_to_synthesize = f.read()
 
-        if args.text is not None:
+        if text_to_synthesize is not None:
+            logger.info("Text: %s", text_to_synthesize)
             api.tts_to_file(
-                text=args.text,
+                text=text_to_synthesize,
                 speaker=args.speaker_idx,
                 language=args.language_idx,
                 speaker_wav=args.speaker_wav,
