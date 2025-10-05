@@ -192,6 +192,11 @@ def parse_args(arg_list: list[str] | None) -> argparse.Namespace:
         help="Output wav file path.",
     )
     parser.add_argument("--use_cuda", action="store_true", help="Run model on CUDA.")
+    parser.add_argument(
+        "--use_torch_compile",
+        action="store_true",
+        help="Enable torch.compile() for the model.",
+    )
     parser.add_argument("--device", type=str, help="Device to run model on.", default="cpu")
     parser.add_argument(
         "--vocoder_path",
@@ -372,6 +377,7 @@ def main(arg_list: list[str] | None = None) -> None:
             speakers_file_path=args.speakers_file_path,
             language_ids_file_path=args.language_ids_file_path,
             progress_bar=args.progress_bar,
+            use_torch_compile=args.use_torch_compile,
         ).to(device)
 
         # query speaker ids of a multi-speaker model.

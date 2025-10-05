@@ -34,6 +34,7 @@ class TTS(nn.Module):
         language_ids_file_path: str | None = None,
         progress_bar: bool = True,
         gpu: bool = False,
+        use_torch_compile: bool = False,
     ) -> None:
         """🐸TTS python interface that allows to load and use the released models.
 
@@ -88,6 +89,7 @@ class TTS(nn.Module):
         self.encoder_config_path = encoder_config_path
         self.speakers_file_path = speakers_file_path
         self.language_ids_file_path = language_ids_file_path
+        self.use_torch_compile = use_torch_compile
 
         if gpu:
             warnings.warn("`gpu` will be deprecated. Please use `tts.to(device)` instead.")
@@ -216,6 +218,7 @@ class TTS(nn.Module):
             vocoder_config=vocoder_config_path,
             model_dir=model_dir,
             use_cuda=gpu,
+            use_torch_compile=self.use_torch_compile,
         )
 
     def load_tts_model_by_name(self, model_name: str, vocoder_name: str | None = None, *, gpu: bool = False) -> None:
@@ -246,6 +249,7 @@ class TTS(nn.Module):
             encoder_config=self.encoder_config_path,
             model_dir=model_dir,
             use_cuda=gpu,
+            use_torch_compile=self.use_torch_compile,
         )
 
     def load_tts_model_by_path(self, model_path: str, config_path: str, *, gpu: bool = False) -> None:
@@ -269,6 +273,7 @@ class TTS(nn.Module):
             encoder_checkpoint=self.encoder_path,
             encoder_config=self.encoder_config_path,
             use_cuda=gpu,
+            use_torch_compile=self.use_torch_compile,
         )
 
     def _check_arguments(

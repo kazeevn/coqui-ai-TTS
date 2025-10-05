@@ -45,6 +45,7 @@ class Synthesizer(nn.Module):
         model_dir: str | os.PathLike[Any] | None = None,
         voice_dir: str | os.PathLike[Any] | None = None,
         use_cuda: bool = False,
+        use_torch_compile: bool = False,
     ) -> None:
         """General 🐸 TTS interface for inference. It takes a tts and a vocoder
         model and synthesize speech from the provided text.
@@ -81,6 +82,7 @@ class Synthesizer(nn.Module):
         self.vc_config = optional_to_str(vc_config)
         model_dir = optional_to_str(model_dir)
         self.use_cuda = use_cuda
+        self.use_torch_compile = use_torch_compile
 
         self.tts_model: BaseTTS | None = None
         self.vocoder_model: BaseVocoder | None = None
@@ -153,6 +155,9 @@ class Synthesizer(nn.Module):
         if use_cuda:
             self.vc_model.cuda()
 
+        if self.use_torch_compile:
+            self.vc_model = torch.compile(self.vc_model)
+
     def _load_fairseq_from_dir(self, model_dir: str, use_cuda: bool) -> None:
         """Load the fairseq model from a directory.
 
@@ -165,6 +170,9 @@ class Synthesizer(nn.Module):
         self.output_sample_rate = self.tts_config.audio["sample_rate"]
         if use_cuda:
             self.tts_model.cuda()
+
+        if self.use_torch_compile:
+            self.tts_model = torch.compile(self.tts_model)
 
     def _load_openvoice_from_dir(self, checkpoint: Path, use_cuda: bool) -> None:
         """Load the OpenVoice model from a directory.
@@ -180,6 +188,9 @@ class Synthesizer(nn.Module):
         if use_cuda:
             self.vc_model.cuda()
 
+        if self.use_torch_compile:
+            self.vc_model = torch.compile(self.vc_model)
+
     def _load_tts_from_dir(self, model_dir: str, use_cuda: bool) -> None:
         """Load the TTS model from a directory.
 
@@ -192,6 +203,9 @@ class Synthesizer(nn.Module):
         self.tts_model.load_checkpoint(config, checkpoint_dir=model_dir, eval=True)
         if use_cuda:
             self.tts_model.cuda()
+
+        if self.use_torch_compile:
+            self.tts_model = torch.compile(self.tts_model)
 
     def _load_tts(self, tts_checkpoint: str, tts_config_path: str, use_cuda: bool) -> None:
         """Load the TTS model.
@@ -221,6 +235,9 @@ class Synthesizer(nn.Module):
         self.tts_model.load_checkpoint(self.tts_config, tts_checkpoint, eval=True)
         if use_cuda:
             self.tts_model.cuda()
+
+        if self.use_torch_compile:
+            self.tts_model = torch.compile(self.tts_model)
 
         if self.encoder_checkpoint and hasattr(self.tts_model, "speaker_manager"):
             self.tts_model.speaker_manager.init_encoder(self.encoder_checkpoint, self.encoder_config, use_cuda)
@@ -253,6 +270,9 @@ class Synthesizer(nn.Module):
         self.vocoder_model.load_checkpoint(self.vocoder_config, model_file, eval=True)
         if use_cuda:
             self.vocoder_model.cuda()
+
+        if self.use_torch_compile:
+            self.vocoder_model = torch.compile(self.vocoder_model)
 
     def split_into_sentences(self, text) -> list[str]:
         """Split give text into sentences.
