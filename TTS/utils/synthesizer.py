@@ -90,7 +90,7 @@ class Synthesizer(nn.Module):
         self.seg = self._get_segmenter("en")
         self.use_cuda = use_cuda
         if self.use_cuda:
-            assert torch.cuda.is_available(), "CUDA is not availabe on this machine."
+            assert torch.cuda.is_available(), "CUDA is not available on this machine."
 
         self.checkpoint_dir = None
         if tts_checkpoint:
