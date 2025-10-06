@@ -6,6 +6,7 @@ import argparse
 import contextlib
 import logging
 import sys
+from pathlib import Path
 from argparse import RawTextHelpFormatter
 
 # pylint: disable=redefined-outer-name, unused-argument
@@ -162,7 +163,7 @@ def parse_args(arg_list: list[str] | None) -> argparse.Namespace:
     )
 
     parser.add_argument("--text", type=str, default=None, help="Text to generate speech.")
-    parser.add_argument("--text_file", type=str, default=None, help="Path to a text file to generate speech from.")
+    parser.add_argument("--text_file", type=Path, default=None, help="Path to a text file to generate speech from.")
 
     # Args for running pre-trained TTS models.
     parser.add_argument(
